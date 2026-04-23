@@ -10,6 +10,7 @@ urlpatterns = [
 
 # Ensure Arches core urls are superseded by project-level urls
 urlpatterns.append(path("", include("arches.urls")))
+urlpatterns.append(path("", include("arches_lingo.urls")))
 
 
 # Adds URL pattern to serve media files during development

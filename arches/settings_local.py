@@ -25,6 +25,48 @@ MODE = get_env_variable("DJANGO_MODE")
 
 DEBUG = ast.literal_eval(get_env_variable("DJANGO_DEBUG"))
 
+INSTALLED_APPS = [
+    "arches_component_lab",
+    "arches_controlled_lists",
+    "arches_lingo",
+    "pgtrigger"
+]
+
+LINGO_ALLOW_ANONYMOUS_ACCESS = True
+
+REFERENCES_INDEX_NAME = "references"
+ELASTICSEARCH_CUSTOM_INDEXES = [
+    {
+        "module": "arches_controlled_lists.search_indexes.reference_index.ReferenceIndex",
+        "name": REFERENCES_INDEX_NAME,
+        "should_update_asynchronously": True,
+    }
+]
+TERM_SEARCH_TYPES = [
+    {
+        "type": "term",
+        "label": _("Term Matches"),
+        "key": "terms",
+        "module": "arches.app.search.search_term.TermSearch",
+    },
+    {
+        "type": "concept",
+        "label": _("Concepts"),
+        "key": "concepts",
+        "module": "arches.app.search.concept_search.ConceptSearch",
+    },
+    {
+        "type": "reference",
+        "label": _("References"),
+        "key": REFERENCES_INDEX_NAME,
+        "module": "arches_controlled_lists.search_indexes.reference_index.ReferenceIndex",
+    },
+]
+
+ES_MAPPING_MODIFIER_CLASSES = [
+    "arches_controlled_lists.search.references_es_mapping_modifier.ReferencesEsMappingModifier"
+]
+
 if not DEBUG:
     # Some extra security settings for production deployments
 
@@ -110,10 +152,12 @@ LANGUAGE_CODE = 'en'
 # Added for v7 internationalization demo
 # Change these to match the languages you want to support
 LANGUAGES = [
-    ('en', ('English')),
-    ('ar', ('Arabic')),
-    ('he', ('Hebrew')),
+    ('en', ('English'))
 ]
 # This does not work when using gunicorn
 # SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1
 SHOW_LANGUAGE_SWITCH = False
+
+MIDDLEWARE = [
+    "django.middleware.locale.LocaleMiddleware"
+]

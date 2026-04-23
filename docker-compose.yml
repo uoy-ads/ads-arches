@@ -69,7 +69,6 @@ services:
 
   arches:
     container_name: arches
-    image: arches
     env_file:
       - ./.env
     build:
@@ -87,7 +86,7 @@ services:
     stdin_open: true # docker run -i
     tty: true        # docker run -t
     ports:
-      - "5432:5432"
+      - "5433:5432"
       - 8004:8000
       - 5678:5678
       - 5984:5984
@@ -97,8 +96,6 @@ services:
       - arches_redis
     command:
       - run_arches
-    expose:
-      - 8004:8000
     volumes:
       - arches-log:/web_root/logs
       - arches-static:/static_root

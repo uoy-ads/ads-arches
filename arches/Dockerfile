@@ -103,7 +103,6 @@ RUN set -ex \
         python3-dev \
         postgresql-client-14 \
         dos2unix \
-        wait-for-it \
         nano \
     " \
     && curl -sL https://deb.nodesource.com/setup_16.x | bash - \

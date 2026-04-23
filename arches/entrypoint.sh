@@ -342,10 +342,21 @@ run_django_server() {
 	fi
 }
 
+
+run_load_lingo() {
+    echo ""
+    echo "----- *** LOADING ARCHES-LINGO *** -----"
+    echo ""
+    cd ${APP_FOLDER}
+    python manage.py packages -o load_package -a arches_lingo --yes
+}
+
+
 #### Main commands
 run_arches() {
 	init_arches
 	run_elastic_safe_migrations
+	run_load_lingo
 	run_createcachetable
 	start_celery_supervisor
 	run_setup_arches_setup_webpack

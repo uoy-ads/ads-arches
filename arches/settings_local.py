@@ -25,12 +25,12 @@ MODE = get_env_variable("DJANGO_MODE")
 
 DEBUG = ast.literal_eval(get_env_variable("DJANGO_DEBUG"))
 
-INSTALLED_APPS = [
+INSTALLED_APPS = (
     "arches_component_lab",
     "arches_controlled_lists",
     "arches_lingo",
     "pgtrigger"
-]
+)
 
 LINGO_ALLOW_ANONYMOUS_ACCESS = True
 

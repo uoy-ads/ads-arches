@@ -14,23 +14,7 @@ COUCHDB_URL=${COUCHDB_URL}
 
 #Utility functions that check db status
 wait_for_db() {
-	echo "Testing if database server is up..."
-	while [[ ! ${return_code} == 0 ]]
-	do
-        psql --host=${PGHOST} --port=${PGPORT} --user=${PGUSERNAME} --dbname=postgres -c "select 1" >&/dev/null
-		return_code=$?
-		sleep 1
-	done
-	echo "Database server is up"
 
-    echo "Testing if Elasticsearch is up..."
-    while [[ ! ${return_code} == 0 ]]
-    do
-        curl -s "http://${ESHOST}:${ESPORT}/_cluster/health?wait_for_status=green&timeout=60s" >&/dev/null
-        return_code=$?
-        sleep 1
-    done
-    echo "Elasticsearch is up"
 }
 
 db_exists() {
@@ -61,10 +45,6 @@ init_arches() {
 		echo "----- Custom Arches project '${ARCHES_PROJECT}' does not exist. -----"
 		echo "----- Creating '${ARCHES_PROJECT}'... -----"
 		echo ""
-
-		cd ${APP_FOLDER}
-		echo "Sleep for a 45 seconds because elastic search seems to need the wait (a total hack)..."
-		sleep 45s;
 		arches-project create ${ARCHES_PROJECT}
 		run_setup_db
 		setup_couchdb
@@ -115,8 +95,6 @@ start_celery_supervisor() {
 	echo ""
 	echo "----- START CELERY SUPERVISOR -----"
 	echo ""
-	echo "Sleep 60s in the hope that arches_redis will be fully up and running..."
-	sleep 60s;
 	if [ -f "/tmp/supervisor.sock" ]; then
 		echo "The celery supervisor seems started, so why try to start it again? "
 	else
@@ -138,19 +116,6 @@ run_elastic_safe_migrations() {
 	echo ""
 	echo "----- RUNNING DATABASE MIGRATIONS WITH ELASTIC CHECK -----"
 	echo ""
-	echo "Testing if Elasticsearch is up..."
-    while [[ ! ${return_code} == 0 ]]
-    do
-        curl -s "http://${ESHOST}:${ESPORT}/_cluster/health?wait_for_status=green&timeout=60s" >&/dev/null
-        return_code=$?
-        sleep 1
-    done
-    echo "Elasticsearch is up"
-	cd ${APP_FOLDER}
-	echo "Sleep for a 20 seconds because elastic search seems to need the wait (a total hack)..."
-	echo "We're running migrations in case the initial db setup failed because elasticsearch was still not quite ready"
-	sleep 20s;
-	echo "Now do Migrations..."
 	python3 manage.py migrate
 }
 
@@ -299,17 +264,6 @@ run_setup_db() {
 	echo ""
 	echo "----- RUNNING SETUP_DB -----"
 	echo ""
-	echo "Testing if Elasticsearch is up..."
-    while [[ ! ${return_code} == 0 ]]
-    do
-        curl -s "http://${ESHOST}:${ESPORT}/_cluster/health?wait_for_status=green&timeout=60s" >&/dev/null
-        return_code=$?
-        sleep 1
-    done
-    echo "Elasticsearch is up, pause for 10 secs to be sure."
-	sleep 10s;
-	echo "Now we should be safe to setup the database"
-	cd ${APP_FOLDER}
 	python3 manage.py setup_db --force
 }
 
@@ -325,7 +279,6 @@ run_django_server() {
 	echo ""
 	echo "----- *** RUNNING DJANGO DEVELOPMENT SERVER *** -----"
 	echo ""
-	sleep 5
 	cd ${APP_FOLDER}
 	if [[ ${DJANGO_DEBUG} == 'True' ]]; then
 		echo "Running DEBUG mode Django"

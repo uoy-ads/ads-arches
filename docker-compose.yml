@@ -5,6 +5,11 @@ services:
     image: postgis/postgis:14-3.2
     env_file:
       - ./.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     environment:
       - PGUSER=postgres
       - POSTGRES_USER=postgres
@@ -30,6 +35,12 @@ services:
     container_name: arches_elasticsearch
     image: elasticsearch:8.5.3
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     env_file:
       - ./.env
     environment:
@@ -54,6 +65,11 @@ services:
     container_name: arches_redis
     image: "redis:6-alpine"
     restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     ports:
       - "6379:6379"
     volumes:
@@ -91,9 +107,12 @@ services:
       - 5678:5678
       - 5984:5984
     depends_on:
-      - arches_db
-      - arches_elasticsearch
-      - arches_redis
+      arches_elasticsearch:
+        condition: service_healthy
+      arches_db:
+        condition: service_healthy
+      arches_redis:
+        condition: service_healthy
     command:
       - run_arches
     volumes:

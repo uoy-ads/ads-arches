@@ -161,7 +161,8 @@ RUN pip install supervisor \
     && pip install tzdata --upgrade \
     && pip install Redis \
     && pip install gunicorn \
-    && pip install arches
+    && pip install arches \
+    && arches-lingo
 
 # create a new Arches project
 RUN mkdir -p /new_arches_proj

@@ -162,7 +162,7 @@ RUN pip install supervisor \
     && pip install Redis \
     && pip install gunicorn \
     && pip install arches \
-    && arches-lingo
+    && pip install arches-lingo
 
 # create a new Arches project
 RUN mkdir -p /new_arches_proj
